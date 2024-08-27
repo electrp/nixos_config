@@ -17,24 +17,22 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
-    overlays = import ./overlays {inherit inputs;};
+  outputs = { self, nixpkgs, home-manager, ... }@inputs: let 
+    inherit (self) outputs;
+  in rec{
+    overlays = import ./overlays/unstable.nix {inherit inputs;};
 
     homeConfigurations = {
       electrp = home-manager.lib.homeManagerConfiguration {
-        pkgs = import nixpkgs {
-          overlays = [
-            self.overlays.unstable-packages
-	    self.overlays.master-packages
-	  ];
-	};
+        pkgs = import nixpkgs {};
+	extraSpecialArgs = {inherit inputs outputs;};
       };
     };
 
     # Please replace my-nixos with your hostname
     nixosConfigurations.electrp = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      specialArgs = { inherit inputs; };
+      specialArgs = { inherit inputs outputs; };
       modules = [
         # Import the previous configuration.nix we used,
         # so the old configuration file still takes effect
@@ -48,16 +46,18 @@
 	./devices.nix
 	./rust.nix
 
-	home-manager.nixosModules.home-manager
+	home-manager.nixosModules.home-manager 
 	{
           home-manager.useGlobalPkgs = true;
 	  home-manager.useUserPackages = true;
+
+          home-manager.extraSpecialArgs = {inherit inputs outputs;};
 
 	  # TODO replace ryan with your own username
 	  home-manager.users.will = import ./will.nix;
 
 	  # Optionally, use home-manager.extraSpecialArgs to pass arguments to home.nix
-	}
+        }
       ];
     };
 

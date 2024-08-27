@@ -1,16 +1,9 @@
-{ config, pkgs, outputs, ... }:
+{ inputs, config, pkgs, outputs, ... }:
 
 {
   # TODO please change the username & home directory to your own
   home.username = "will";
   home.homeDirectory = "/home/will";
-
-  nixpkgs = {
-    overlays = [
-      outputs.overlays.unstable-packages
-      outputs.overlays.master-packages
-    ];
-  };
 
   # set cursor size and dpi for 4k monitor
   xresources.properties = {
@@ -23,7 +16,7 @@
     firefox
     wofi
     discord
-    osu-lazer-bin
+    unstable.osu-lazer-bin
     opentabletdriver
     godot_4
     gh
