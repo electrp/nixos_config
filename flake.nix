@@ -15,6 +15,8 @@
       # to avoid problems caused by different versions of nixpkgs.
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    ags.url = "github:Aylur/ags";
   };
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs: let 
@@ -60,7 +62,5 @@
         }
       ];
     };
-
-    
   };
 }

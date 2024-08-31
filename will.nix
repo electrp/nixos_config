@@ -5,6 +5,8 @@
   home.username = "will";
   home.homeDirectory = "/home/will";
 
+  imports = [ inputs.ags.homeManagerModules.default ];
+
   # set cursor size and dpi for 4k monitor
   xresources.properties = {
     "Xcursor.size" = 16;
@@ -22,9 +24,27 @@
     gh
     waybar
     github-desktop
+    ncspot
+    google-chrome
+    jetbrains.rider
+    jetbrains.rust-rover
+    subversion
+    libsForQt5.dolphin
+    prismlauncher
+    steam
   ];
 
-	
+  programs.ags = {
+    enable = true;
+    
+    extraPackages = with pkgs; [
+      gtksourceview
+      webkitgtk
+      accountsservice
+    ];
+  };
+
+  dconf.enable = true;
 
   # This value determines the home Manager release that your
   # configuration is compatible with. This helps avoid breakage

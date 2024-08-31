@@ -94,7 +94,24 @@
      tmux
      kitty
      supergfxctl
+     pass
+     pinentry 
+     gnupg
+     spotifyd
+     fish
+     libclang
+     clang-tools
+     gcc
+     gparted
+     polkit
+     libsForQt5.polkit-kde-agent
+     xorg.xhost
+     libsForQt5.partitionmanager
   ];
+
+  security.polkit.enable = true;
+
+  programs.partition-manager.enable = true;
 
   programs.tmux = {
      enable = true;
@@ -112,6 +129,16 @@
         user = "greeter";
       };
     };
+  };
+
+  services.spotifyd = {
+    enable = true;
+  };
+
+  services.pcscd.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
   };
 
   systemd.services.greetd.serviceConfig = {
