@@ -1,7 +1,6 @@
 { inputs, config, pkgs, outputs, ... }:
 
 {
-  # TODO please change the username & home directory to your own
   home.username = "will";
   home.homeDirectory = "/home/will";
 
@@ -17,7 +16,7 @@
   home.packages = with pkgs; [
     firefox
     wofi
-    discord
+    master.discord
     unstable.osu-lazer-bin
     opentabletdriver
     godot_4
@@ -32,7 +31,25 @@
     libsForQt5.dolphin
     prismlauncher
     steam
+    xdg-desktop-portal-hyprland
+    xdg-desktop-portal-gtk
+    unzip
+    lunarvim
+    neovide
+    libreoffice
+    obsidian
+    wl-clipboard
+     opentabletdriver
   ];
+
+
+  xdg.portal = {
+    config.common.default = "*";
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+    ];
+  };
 
   programs.ags = {
     enable = true;

@@ -5,7 +5,16 @@
 { config, pkgs, outputs, ... }:
 
 {
-  
+
+  fileSystems."/win" = {
+    device = "/dev/disk/by-uuid/48B09E3CB09E3084";
+    fsType = "ntfs-3g";
+    options = [
+      "users"
+      "nofail"
+    ];
+  };
+
 
   imports =
     [ # Include the results of the hardware scan.
@@ -15,11 +24,22 @@
   nixpkgs = {
     overlays = [
       outputs.overlays.unstable-packages
+      outputs.overlays.master-packages
+
+      (self: super: {
+        xdg-desktop-portal-gtk = super.xdg-desktop-portal-gtk.overrideAttrs {
+          postInstall = ''
+            sed -i 's/UseIn=gnome/UseIn=gnome;sway/' $out/share/xdg-desktop-portal/portals/gtk.portal
+          '';
+        };
+      } )
     ];
   };
 
   # Enable flakes and new cli
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  boot.initrd.kernelModules = [ "amdgpu" "nvidia" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -49,18 +69,32 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  programs.bash = {
+    interactiveShellInit = ''
+      if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
+      then
+        shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
+        exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
+      fi
+    '';
+  };
+
+
   # Configure keymap in X11
   services.xserver = {
     xkb = {
       layout = "us";
       variant = "";
     };
-    videoDrivers = [ "nvidia" ];
+    enable = true;
+    videoDrivers = [ "nvidia" "amdgpu" ];
   };
+
 
   hardware.nvidia = {
     modesetting.enable = true;
     nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
   };
   
   # Graphics setup
@@ -80,6 +114,12 @@
     ];
   };
 
+  services.asusd = { 
+    enable = true;
+    enableUserService = true;
+  };
+
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -87,7 +127,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
      wget
-     neovim
+     unstable.neovim
      git
      vim
      curl
@@ -107,11 +147,72 @@
      libsForQt5.polkit-kde-agent
      xorg.xhost
      libsForQt5.partitionmanager
+     neofetch
+     hyprshot
+     mako
+     numix-icon-theme-circle
+     colloid-icon-theme
+     catppuccin-gtk
+     catppuccin-kvantum
+     catppuccin-cursors.macchiatoTeal
+     kdePackages.qtwayland
+     cmake
+    libinput
   ];
+
+  services.libinput.enable = true;
 
   security.polkit.enable = true;
 
   programs.partition-manager.enable = true;
+
+  # Enable Theme
+  environment.variables.GTK_THEME = "catppuccin-macchiato-teal-standard";
+  environment.variables.XCURSOR_THEME = "Catppuccin-Macchiato-Teal";
+  environment.variables.XCURSOR_SIZE = "24";
+  environment.variables.HYPRCURSOR_THEME = "Catppuccin-Macchiato-Teal";
+  environment.variables.HYPRCURSOR_SIZE = "24";
+  qt.enable = true;
+  qt.platformTheme = "gtk2";
+  qt.style = "gtk2";
+  console = {
+    earlySetup = true;
+    colors = [
+      "24273a"
+      "ed8796"
+      "a6da95"
+      "eed49f"
+      "8aadf4"
+      "f5bde6"
+      "8bd5ca"
+      "cad3f5"
+      "5b6078"
+      "ed8796"
+      "a6da95"
+      "eed49f"
+      "8aadf4"
+      "f5bde6"
+      "8bd5ca"
+      "a5adcb"
+    ];
+  };
+
+  # Override packages
+  nixpkgs.config.packageOverrides = pkgs: {
+    colloid-icon-theme = pkgs.colloid-icon-theme.override { colorVariants = ["teal"]; };
+    catppuccin-gtk = pkgs.catppuccin-gtk.override {
+      accents = [ "teal" ]; # You can specify multiple accents here to output multiple themes 
+      size = "standard";
+      variant = "macchiato";
+    };
+  };
+
+  programs.fish.enable = true;
+
+  users.defaultUserShell = pkgs.fish;
+
+  
+
 
   programs.tmux = {
      enable = true;
@@ -154,6 +255,7 @@
 
   # Enable supergfxd
   services.supergfxd.enable = true;
+  systemd.services.supergfxd.path = [ pkgs.pciutils ];
   
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
