@@ -10,7 +10,6 @@
     device = "/dev/disk/by-uuid/48B09E3CB09E3084";
     fsType = "ntfs-3g";
     options = [
-      "users"
       "nofail"
     ];
   };
@@ -50,6 +49,8 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
+
+  services.flatpak.enable = true;
 
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";
@@ -119,6 +120,9 @@
     enableUserService = true;
   };
 
+  services.devmon.enable = true;
+  services.gvfs.enable = true;
+  services.udisks2.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -158,6 +162,9 @@
      kdePackages.qtwayland
      cmake
     libinput
+    udiskie
+    usbutils
+    udisks
   ];
 
   services.libinput.enable = true;

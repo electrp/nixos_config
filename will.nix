@@ -16,7 +16,9 @@
   home.packages = with pkgs; [
     firefox
     wofi
-    master.discord
+    (master.discord.override {
+      withOpenASAR = true;
+    })
     unstable.osu-lazer-bin
     opentabletdriver
     godot_4
@@ -26,11 +28,11 @@
     ncspot
     google-chrome
     jetbrains.rider
+    jetbrains.clion
     jetbrains.rust-rover
     subversion
     libsForQt5.dolphin
     prismlauncher
-    steam
     xdg-desktop-portal-hyprland
     xdg-desktop-portal-gtk
     unzip
@@ -40,6 +42,13 @@
     obsidian
     wl-clipboard
      opentabletdriver
+    grim
+    slurp
+    zoxide
+    fzf
+    ddd
+    gdbgui
+    vlc
   ];
 
 

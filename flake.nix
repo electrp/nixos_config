@@ -27,7 +27,7 @@
     homeConfigurations = {
       electrp = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs {};
-	      extraSpecialArgs = {inherit inputs outputs;};
+	extraSpecialArgs = {inherit inputs outputs;};
       };
     };
 
